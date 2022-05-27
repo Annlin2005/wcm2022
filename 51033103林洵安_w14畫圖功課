@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head><meta content="UTF-8">
+    <title>網際內容網際內容管理</title>
+</head>
+<body>
+    <h1>長200寬100像素的紅色長方形</h1>
+    <div style="width: 200px;height: 100px; background-color: red;"> </div>
+</body>
