@@ -1,0 +1,144 @@
+<p>美國國旗</p><p><br /></p><p></p><div class="separator" style="clear: both; text-align: center;"><br /></div><p></p><p><!--導入 brython.js 程式庫--></p><p><!--導入 brython.js 程式庫--></p><p><!--導入 brython.js 程式庫--><script src="https://mde.tw/wcm2022_guide/cmsimde/static/brython.js">
+</script>
+
+<!--導入 brython_stdlib.js 標準程式庫-->
+<script src="https://mde.tw/wcm2022_guide/cmsimde/static/brython_stdlib.js">
+</script>
+
+<!--啟動 brython-->
+<script>
+window.onload=function(){
+brython();
+}
+</script>
+
+<!--執行所需要的 Brython 程式-->
+<script type="text/python3">
+from browser import document as doc
+# 以下將利用 html 產生所需的繪圖畫布
+from browser import html
+# 利用 math 函式庫執行三角函數運算
+import math
+# height = 1, width = 1.9
+width = 600
+height = int(600/1.9)
+canvas = html.CANVAS(width = width, height = height)
+#canvas.style = {"width": "100%"}
+canvas.id = "taiwan_flag"
+# 將圖畫至 id 為 brython_div 的 cnavas 標註
+brython_div = doc["brython_div"]
+brython_div <= canvas
+# 準備繪圖畫布
+canvas = doc["taiwan_flag"]
+ctx = canvas.getContext("2d")
+
+# 進行座標轉換, x 軸不變, y 軸反向且移動 canvas.height 單位光點
+# ctx.setTransform(1, 0, 0, -1, 0, canvas.height)
+
+# 以下採用 canvas 原始座標繪圖
+flag_w = canvas.width
+flag_h = canvas.height
+
+# 先畫滿地紅
+ctx.fillStyle='#B31942'
+ctx.fillRect(0,0,flag_w,flag_h)
+
+# 6 條白色長方形
+# 每條高度 height/13
+ctx.fillStyle ='#FFFFFF'
+white_height = int(height/13)
+whitex = 0
+whitey = white_height
+white_width = width
+for i in range(6):
+    ctx.fillRect(whitex, whitey+i*2*white_height, white_width, white_height)
+
+# 藍色區域
+blue_height = int(height*7/13)
+blue_width = int(width*2/5)
+bluex = 0
+bluey = 0
+ctx.fillStyle ='#0A3161'
+ctx.fillRect(bluex, bluey, blue_width, blue_height)
+
+# 建立畫直線函式
+def draw_line(x1, y1, x2, y2, color="#ff0000"):
+    ctx.beginPath()
+    ctx.moveTo(x1, y1)
+    ctx.lineTo(x2, y2)
+    ctx.strokeStyle = color
+    ctx.stroke()
+
+# 測試畫直線函式功能
+#draw_line(10, 10, 100, 100)
+
+# 定義角度轉換為徑度變數
+deg = math.pi/180.
+
+# 建立五星繪圖函式
+#x, y 為中心, r 為半徑, angle 旋轉角, solid 空心或實心, color 顏色
+def star(x, y, r, angle=0, solid=False, color="#ff0000"):
+    #以 x, y 為圓心, 計算五個外點
+    # 圓心到水平線距離
+    a = r*math.cos(72*deg)
+    # a 頂點向右到內點距離
+    b = (r*math.cos(72*deg)/math.cos(36*deg))*math.sin(36*deg)
+    # 利用畢氏定理求內點半徑
+    rin = math.sqrt(a*a + b*b)
+    # 查驗 a, b 與 rin
+    #print(a, b, rin)
+    if solid:
+        ctx.beginPath()
+    # angle 角度先轉 360/10, 讓五星對正
+    angle = angle + 360/10
+    for i in range(5):
+        xout = (x + r*math.sin((360/5)*deg*i+angle*deg))
+        yout = (y + r*math.cos((360/5)*deg*i+angle*deg))
+        # 外點增量 + 1
+        xout2 = x + r*math.sin((360/5)*deg*(i+1)+angle*deg)
+        yout2 = y + r*math.cos((360/5)*deg*(i+1)+angle*deg)
+        xin = x + rin*math.sin((360/5)*deg*i+36*deg+angle*deg)
+        yin = y + rin*math.cos((360/5)*deg*i+36*deg+angle*deg)
+        # 查驗外點與內點座標
+        #print(xout, yout, xin, yin)
+        if solid:
+            # 填色
+            if i==0:
+                ctx.moveTo(xout, yout)
+                ctx.lineTo(xin, yin)
+                ctx.lineTo(xout2, yout2)
+            else:
+                ctx.lineTo(xin, yin)
+                ctx.lineTo(xout2, yout2)
+        else:
+            # 空心
+            draw_line(xout, yout, xin, yin, color)
+            # 畫空心五芒星, 無關畫線次序, 若實心則與畫線次序有關
+            draw_line(xout2, yout2, xin, yin, color)
+    if solid:
+        ctx.fillStyle = color
+        ctx.fill()
+
+# 白色五星
+white = "#FFFFFF"
+# 單數排白色五星
+star1x = int(blue_width/12)
+star1y = int(blue_height/10)
+star_radius = int(white_height*4/5/2)
+# 沿 x 方向有 6 顆白色五星
+# 沿 y 方向有 5 顆白色五星
+inc1x = int(2*blue_width/12)
+inc1y = int(2*blue_height/10)
+for i in range(6):
+    for j in range(5):
+        star(star1x+i*inc1x, star1y+j*inc1y, star_radius, solid=True, color=white)
+# 雙數排白色五星
+star2x = int(blue_width/12 + blue_width/12)
+star2y = int(blue_height/10 + blue_height/10)
+# 沿 x 方向有 5 顆白色五星
+# 沿 y 方向有 4 顆白色五星
+for i in range(5):
+    for j in range(4):
+        star(star2x+i*inc1x, star2y+j*inc1y, star_radius, solid=True, color=white)
+</script>
+</p><div id="brython_div"></div>
